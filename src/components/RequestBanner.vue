@@ -185,6 +185,7 @@ import { initializeApp } from "firebase/app";
 import { getStorage, ref as imgRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import axios from 'axios';
 import queryString from 'query-string';
+import Line from "../line"
 
 const firebaseConfig = {
   apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
@@ -234,35 +235,7 @@ const data = reactive ({
 })
 // 依頼の追加
 const add = ()=> {
-  const BASE_URL = 'https://notify-api.line.me';
-  const PATH =  '/api/notify';
-  const LINE_TOKEN = `FDic9TvvW5oaLTmnjzUgviTEos08HTZahtXbRVqWnZQ`;
-
-  let config = {
-    baseURL: BASE_URL,
-    url: PATH,
-    method: 'post',
-    headers: {
-        'Content-type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer' + LINE_TOKEN
-    },
-    data: queryString.stringify({
-        message: 'test',
-    })
-  };
-  axios.request(config)
-    .then((res) => {
-        console.log(res.status);
-    })
-    .catch((error) => {
-        console.log(error);
-  });
-
-
-
-
-
-
+  Line.main();
   data.uploadModal = true
   let d = new Date()
   let id = d.getTime()
