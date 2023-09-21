@@ -103,7 +103,7 @@
             </ul>
           </div>
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button @click="add" class="btn btn-primary">投稿</button>
+            <button @click="add();line();" class="btn btn-primary">投稿</button>
           </div>
         </div>
       </div>
@@ -234,8 +234,32 @@ const data = reactive ({
   img: 'false',
 })
 // 依頼の追加
+const line = ()=> {
+  const BASE_URL = 'https://notify-api.line.me';
+const PATH =  '/api/notify';
+const LINE_TOKEN = `FDic9TvvW5oaLTmnjzUgviTEos08HTZahtXbRVqWnZQ`;
+
+const params = new URLSearchParams({
+    message: 'テスト',
+});
+
+const config = {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Bearer ${LINE_TOKEN}`
+    },
+    body: params.toString()
+};
+
+
+const main = async () => {
+    const res = await fetch(BASE_URL + PATH, config);
+    console.log(res.status);
+}
+main()
+}
 const add = ()=> {
-  Line.main();
   data.uploadModal = true
   let d = new Date()
   let id = d.getTime()

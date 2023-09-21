@@ -20,7 +20,6 @@ const main = async () => {
     const res = await fetch(BASE_URL + PATH, config);
     console.log(res.status);
 }
-
-export default {
+export default{
     main,
-};
+}
