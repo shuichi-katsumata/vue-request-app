@@ -103,7 +103,7 @@
             </ul>
           </div>
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button @click="add();line();" class="btn btn-primary">投稿</button>
+            <button @click="add" class="btn btn-primary">投稿</button>
           </div>
         </div>
       </div>
@@ -184,8 +184,7 @@ import { getDatabase, ref as dbRef, set, query, get, orderByChild, equalTo } fro
 import { initializeApp } from "firebase/app";
 import { getStorage, ref as imgRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import axios from 'axios';
-import queryString from 'query-string';
-import Line from "../line"
+import qs from 'qs';
 
 const firebaseConfig = {
   apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
@@ -234,32 +233,36 @@ const data = reactive ({
   img: 'false',
 })
 // 依頼の追加
-const line = ()=> {
-  const BASE_URL = 'https://notify-api.line.me';
-const PATH =  '/api/notify';
-const LINE_TOKEN = `FDic9TvvW5oaLTmnjzUgviTEos08HTZahtXbRVqWnZQ`;
-
-const params = new URLSearchParams({
-    message: 'テスト',
-});
-
-const config = {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Bearer ${LINE_TOKEN}`
-    },
-    body: params.toString()
-};
-
-
-const main = async () => {
-    const res = await fetch(BASE_URL + PATH, config);
-    console.log(res.status);
-}
-main()
-}
 const add = ()=> {
+
+  const BASE_URL = 'https://notify-api.me';
+  const PATH =  '/api/notifys';
+  const LINE_TOKEN = `FDic9TvvW5oaLTmnjzUgviTEos08HTZahtXbRVqWnZQ`;
+
+  let config = {
+      baseURL: BASE_URL,
+      url: PATH,
+      method: 'post',
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Bearer ${LINE_TOKEN}`
+      },
+      data: qs.stringify({
+          message: `テスト`,
+      })
+  };
+
+  axios.request(config)
+  .then((res) => {
+      console.log('success');
+      console.log(res.status);
+  })
+  .catch((error) => {
+      console.log(error);
+  });
+
+
+
   data.uploadModal = true
   let d = new Date()
   let id = d.getTime()
