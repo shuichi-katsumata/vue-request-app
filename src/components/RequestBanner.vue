@@ -111,7 +111,7 @@
 
     <div v-show="data.uploadModal">
       <div class="z-2 position-fixed top-0 start-0 h-100 w-100 d-flex items-center justify-content-center" style="background-color:rgba(0,0,0,0.5)">
-        <div class="z-3 bg-white .text-secondary w-25 h-25 rounded mt-4">
+        <div class="z-3 bg-white .text-secondary w-50 h-25 rounded mt-4">
           <div class="d-flex flex-column p-3">
             <div class="d-flex justify-content-center items-center">
               <h2 class="fs-3 lh-lg">
@@ -183,8 +183,6 @@ import { useStore } from 'vuex';
 import { getDatabase, ref as dbRef, set, query, get, orderByChild, equalTo } from "firebase/database";
 import { initializeApp } from "firebase/app";
 import { getStorage, ref as imgRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import axios from 'axios';
-import qs from 'qs';
 
 const firebaseConfig = {
   apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
@@ -234,35 +232,6 @@ const data = reactive ({
 })
 // 依頼の追加
 const add = ()=> {
-
-  const BASE_URL = 'https://notify-api.me';
-  const PATH =  '/api/notifys';
-  const LINE_TOKEN = `FDic9TvvW5oaLTmnjzUgviTEos08HTZahtXbRVqWnZQ`;
-
-  let config = {
-      baseURL: BASE_URL,
-      url: PATH,
-      method: 'post',
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Bearer ${LINE_TOKEN}`
-      },
-      data: qs.stringify({
-          message: `テスト`,
-      })
-  };
-
-  axios.request(config)
-  .then((res) => {
-      console.log('success');
-      console.log(res.status);
-  })
-  .catch((error) => {
-      console.log(error);
-  });
-
-
-
   data.uploadModal = true
   let d = new Date()
   let id = d.getTime()

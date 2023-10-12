@@ -49,7 +49,7 @@
                 <label class="me-4">
                   <input type="checkbox" v-model="isCheckedPlain.checked"> その他
                 </label>
-                <input v-model="data.otherRetouching" class="form-control" :disabled="isCheckedPlain.checked ? false : true" style="border: 1px solid #e1e1e1;" placeholder="髪色やネイルの修正等">
+                <input v-model="data.otherRetouching" class="form-control" :disabled="isCheckedPlain.checked ? false : true" style="border: 1px solid #e1e1e1;" placeholder="髪色やピアス、ネイルの修正等">
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@
 
       <div v-show="data.uploadModal">
         <div class="z-2 position-fixed top-0 start-0 h-100 w-100 d-flex items-center justify-content-center" style="background-color:rgba(0,0,0,0.5)">
-          <div class="z-3 bg-white .text-secondary w-25 h-25 rounded mt-4">
+          <div class="z-3 bg-white .text-secondary w-50 h-25 rounded mt-4">
             <div class="d-flex flex-column p-3">
               <div class="d-flex justify-content-center items-center">
                 <h2 class="fs-3 lh-lg">
