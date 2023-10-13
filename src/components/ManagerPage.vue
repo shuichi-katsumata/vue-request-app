@@ -56,7 +56,7 @@
               <td class="text-wrap">{{ item.retouchings }}</td>
               <td class="text-wrap">{{ item.faceRetouching }}</td>
               <td class="text-wrap">{{ item.deadlines }}</td>
-              <td class="text-end">
+              <td>
                 <button class="btn btn_space btn-secondary pe-none" v-if="item.img == 'false'" ><i class="fa-solid fa-download" style="color: #ffffff;"></i></button>
                 <button class="btn btn_space btn-success" @click="imagesDownload(item.castName)" v-if="item.img == 'true'"><i class="fa-solid fa-download" style="color: #ffffff;"></i></button>
                 <button class="btn btn-danger ms-3" @click="retouchCompleted(item.id); DeleteImage(item.castName);">完了</button>
