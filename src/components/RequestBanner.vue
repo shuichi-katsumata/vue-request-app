@@ -69,10 +69,10 @@
                   <input type="radio" v-model="data.deadline" name="deadline" value="大至急"> 大至急
                 </label>
                 <label class="me-4">
-                  <input type="radio" v-model="data.deadline" name="deadline" value="～３日"> ～３日
+                  <input type="radio" v-model="data.deadline" name="deadline" value="3"> ～３日
                 </label>
                 <label class="me-4">
-                  <input type="radio" v-model="data.deadline" name="deadline" value="～７日"> ～７日
+                  <input type="radio" v-model="data.deadline" name="deadline" value="7"> ～７日
                 </label>
                 <label class="me-4">
                   <input type="radio" v-model="data.deadline" name="deadline" value="お任せ"> お任せ
@@ -211,7 +211,7 @@ const data = reactive ({
   eventDetails: '',
   wording: '',
   others: '',
-  deadline: [],
+  deadline: '',
   otherDeadline: [],
   deadlines: [],
   shop: '',
@@ -266,6 +266,17 @@ const add = ()=> {
     }
   })
   // DB書き込み
+  function getDate(deadline) {
+    if (deadline) {
+      const date = new Date();
+      date.setDate(date.getDate() + deadline);
+      const month = date.getMonth() + 1;
+      const day = date.getDate()
+      return String(month) + '/' + String(day);
+    } else {
+      return data.deadline;
+    }
+  }
   set(dbRef(db, 'banner/' + id), {
     manager: data.manager,
     sizes: data.size + ',' + data.otherSize,
@@ -273,7 +284,7 @@ const add = ()=> {
     eventDetails: data.eventDetails,
     wording: data.wording,
     others: data.others,
-    deadlines: data.deadline +  ' ' + data.otherDeadline,
+    deadlines: getDate(parseFloat(data.deadline)) +  ' ' + data.otherDeadline,
     shop: data.shop,
     completed: 'false',
     id: id,
