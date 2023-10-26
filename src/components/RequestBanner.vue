@@ -86,19 +86,21 @@
               </div>
             </div>
           </div>
-          <div class="img_post">
           <h5> 参考画像や使用素材：</h5>
-          <input class="phone_area" type="file" @change="uploadFile" multiple>
+          <div class="phone_area">
+            <label class="select_file">
+              <input type="file" @change="uploadFile" multiple>ファイル選択
+            </label>
           </div>
-          <div class="pc_area"><div class="drop_area text-secondary fw-bold fs-4 d-flex justify-content-center align-items-center" @dragenter="dragEnter" @dragleave="dragLeave" @dragover.prevent @drop.prevent="dropFile"  :class="{ enter: data.isEnter }">ファイルアップロード</div></div>
+          <div class="pc_area">
+            <div class="drop_area text-secondary fw-bold fs-4 d-flex justify-content-center align-items-center" @dragenter="dragEnter" @dragleave="dragLeave" @dragover.prevent @drop.prevent="dropFile"  :class="{ enter: data.isEnter }">ファイルアップロード</div></div>
           <div>
-            <ul class="list-unstyled d-flex flex-wrap justify-content-between align-items-center mt-3 p-0">
-              <li v-for="(file, img) in send_files" :key="img" @click="deleteFile(img)" class="cursor d-flex align-items-center flex-column fs-6 m-2">
-                <div class="position-relative">
-                  <span class="position-absolute delete-mark">&times</span>
-                  <img class="file_icon" src="../assets/img/icon-file.png">
+            <ul class="list-unstyled d-flex flex-wrap justify-content-start mt-3 p-0">
+              <li v-for="(imgUrl, img) in imgUrls" :key="img" class="position-relative cursor d-flex flex-column fs-6 p-2 w-25">
+                <div>
+                  <span class="position-absolute display-6 delete-mark"  @click="deleteFile(img)">&times</span>
+                  <img id="thumb" class="w-100" :key="imgUrl" :src="imgUrl">
                 </div>
-                <span>{{ file.name }}</span>
               </li>
             </ul>
           </div>
@@ -111,7 +113,7 @@
 
     <div v-show="data.uploadModal">
       <div class="z-2 position-fixed top-0 start-0 h-100 w-100 d-flex items-center justify-content-center" style="background-color:rgba(0,0,0,0.5)">
-        <div class="z-3 bg-white .text-secondary w-50 h-25 rounded mt-4">
+        <div class="z-3 bg-white .text-secondary w-50 rounded mt-4" style="height: fit-content;">
           <div class="d-flex flex-column p-3">
             <div class="d-flex justify-content-center items-center">
               <h2 class="fs-3 lh-lg">
@@ -229,6 +231,7 @@ const data = reactive ({
   send_completed: true,
   progressBar: false,
   img: 'false',
+  imgUrls: [],
 })
 // 依頼の追加
 const add = ()=> {
@@ -292,9 +295,7 @@ const add = ()=> {
   })
 }
 // 画像のアップロード(PC)
-const send_files = computed(function() {
-  return data.files
-})
+const imgUrls = data.imgUrls;
 const dragEnter = ()=> {
   data.isEnter = true;
 }
@@ -302,25 +303,45 @@ const dragLeave = ()=> {
   data.isEnter = false;
 }
 function dropFile(event) {
-  data.files.push(...event.dataTransfer.files);
-   // ...で複数選べる
+  const array = [];
+  array.push(...event.dataTransfer.files); // ...で複数選べる
   data.isEnter = false;
+  for( let i = 0; i < event.dataTransfer.files.length; i++ ) {
+    const file =  event.dataTransfer.files[i];
+    const reader = new FileReader();
+    reader.onload = function() {
+      // サムネイルとして表示
+      imgUrls.push(reader.result);
+      data.files.push(file);
+    };
+    reader.readAsDataURL(file);
+  }
+  event.preventDefault();
 }
 function deleteFile(img) {
-  data.files.splice(img, 1)
+  data.imgUrls.splice(img, 1);
+  data.files.splice(img, 1);
 }
 // 画像のアップロード(スマホ・タブレット)
 function uploadFile(event) {
   for( let i = 0; i < event.target.files.length; i++ ) {
-    data.files.push(event.target.files[i]);
+    const file =  event.target.files[i];
+    const reader = new FileReader();
+    reader.onload = function() {
+      // サムネイルとして表示
+      imgUrls.push(reader.result);
+      data.files.push(file);
+    };
+    reader.readAsDataURL(file);
   }
+  console.log(data.files);
+  console.log(imgUrls);
+  event.preventDefault();
 }
-
 const closeUploadModal = () => {
   data.uploadModal = false;  
   location.reload(); 
 }
-
 // DB取得
 const getBannerData = ()=> {
   get(query(databaseRef, orderByChild('completed'), equalTo('false'))).then((snapshot)=> {
@@ -351,7 +372,6 @@ const page = computed({
     data.store.commit('set_page',pg)
   }
 })
-
 // 次のページ
 const next = ()=> {
   page.value++
@@ -360,7 +380,6 @@ const next = ()=> {
 const prev = ()=> {
   page.value--
 }
-
 onMounted(()=> {
   getBannerData()
 })

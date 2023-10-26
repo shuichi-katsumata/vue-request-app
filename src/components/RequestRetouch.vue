@@ -84,19 +84,21 @@
               </div>
             </div>
           </div>
-          <div class="img_post">
-            <h5> レタッチ画像：</h5>
-            <input class="phone_area" type="file" @change="uploadFile" multiple>
+          <h5> レタッチ画像：</h5>
+          <div class="phone_area">
+            <label class="select_file">
+              <input type="file" @change="uploadFile" multiple>ファイル選択
+            </label>
           </div>
-          <div class="pc_area"><div class="drop_area text-secondary fw-bold fs-4 d-flex justify-content-center align-items-center" @dragenter="dragEnter" @dragleave="dragLeave" @dragover.prevent @drop.prevent="dropFile"  :class="{ enter: data.isEnter }">ファイルアップロード</div></div>
+          <div class="pc_area">
+            <div class="drop_area text-secondary fw-bold fs-4 d-flex justify-content-center align-items-center" @dragenter="dragEnter" @dragleave="dragLeave" @dragover.prevent @drop.prevent="dropFile"  :class="{ enter: data.isEnter }">ファイルアップロード</div></div>
           <div>
-            <ul class="list-unstyled d-flex flex-wrap justify-content-between align-items-center mt-3 p-0">
-              <li v-for="(file, img) in send_files" :key="img" @click="deleteFile(img)" class="cursor d-flex align-items-center flex-column fs-6 m-2">
-                <div class="position-relative">
-                  <span class="position-absolute delete-mark">&times</span>
-                  <img class="file_icon" src="../assets/img/icon-file.png">
+            <ul class="list-unstyled d-flex flex-wrap justify-content-start mt-3 p-0">
+              <li v-for="(imgUrl, img) in imgUrls" :key="img"  class="position-relative cursor d-flex flex-column fs-6 p-2 w-25">
+                <div>
+                  <span class="position-absolute display-6 delete-mark" @click="deleteFile(img)">&times</span>
+                  <img id="thumb" class="w-100" :key="imgUrl" :src="imgUrl">
                 </div>
-                <span>{{ file.name }}</span>
               </li>
             </ul>
           </div>
@@ -108,7 +110,7 @@
 
       <div v-show="data.uploadModal">
         <div class="z-2 position-fixed top-0 start-0 h-100 w-100 d-flex items-center justify-content-center" style="background-color:rgba(0,0,0,0.5)">
-          <div class="z-3 bg-white .text-secondary w-50 h-25 rounded mt-4">
+          <div class="z-3 bg-white .text-secondary w-50 rounded mt-4" style="height: fit-content;">
             <div class="d-flex flex-column p-3">
               <div class="d-flex justify-content-center items-center">
                 <h2 class="fs-3 lh-lg">
@@ -166,127 +168,126 @@
     </section>
   </template>
   
-  <script>
-  export default {
-    name: 'retouch',
-  }
-  </script>
- 
-  <script setup>
-  import { onMounted, reactive, computed } from 'vue';
-  import { useStore } from 'vuex';
-  import { getDatabase, ref, set, query, get, orderByChild, equalTo } from "firebase/database";
-  import { initializeApp } from "firebase/app";
-  import { getStorage, ref as imgRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+<script>
+export default {
+  name: 'retouch',
+}
+</script>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
-    authDomain: "nicoro-request-form.firebaseapp.com",
-    databaseURL: "https://nicoro-request-form-default-rtdb.firebaseio.com",
-    projectId: "nicoro-request-form",
-    storageBucket: "nicoro-request-form.appspot.com",
-    messagingSenderId: "771124177365",
-    appId: "1:771124177365:web:d19a5c49a3a5750bb4b55c"
-  };
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const databaseRetouchRef = ref(db, 'retouch');
-  const isCheckedPlain = reactive({
-          checked: false
-        })
-  const isCheckedPlain2 = reactive({
-          checked: false
-        })
-  const data = reactive ({
-    manager: '',
-    retouching: [],
-    otherRetouching: [],
-    retouchings: [],
-    castName: '',
-    faceRetouching: '',
-    deadline: '',
-    otherDeadline: [],
-    deadlines: [],
-    shop: '',
-    num_per_page: 5,
-    fire_data: [],
-    completed: '',
-    store: useStore(),
-    id: '',
-    isEnter: false,
-    files: [],
-    successWidth: 0,
-    uploadModal: false,
-    send: '送信完了',
-    sending: false,
-    send_completed: true,
-    progressBar: false,
-    img: 'false',
-  })
-  // 依頼の追加
-  const add = ()=> {
-    data.uploadModal = true
-    let d = new Date()
-    let id = d.getTime()
-    const imagePaths = [];
-    const metadata = {
-      contentType: 'image/jpeg',
-    }
-    // 画像がある時の処理
-    const storage = getStorage(app);
-    data.files.map(async file => {
-      data.progressBar = true
-      data.sending = true
-      data.send_completed = false
-      data.send = '送信中'
-      data.img = 'true'
-      const fileRef = imgRef(storage, data.castName + '/' + file.name);
-      await uploadBytesResumable(fileRef, file, metadata);
-      const singleImgPath = await getDownloadURL(fileRef);
-      imagePaths.push(singleImgPath)
-      if(imagePaths.length == data.files.length){
-        console.log('got all paths here now:', imagePaths);
-        const uploadTask = uploadBytesResumable(fileRef, file);
-        uploadTask.on('state_changed', (snapshot)=> {
-          let percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          data.successWidth = percentage;
-          if (percentage == 100) {
-            data.send = '送信完了'
-            data.sending = false
-            data.send_completed = true
-          }
-        });
-      }
-    })
-    // DB書き込み
-    function getDate(deadline) {
-      if (deadline) {
-        const date = new Date();
-        date.setDate(date.getDate() + deadline);
-        const month = date.getMonth() + 1;
-        const day = date.getDate()
-        return String(month) + '/' + String(day);
-      } else {
-        return data.deadline;
-      }
-    }
-    set(ref(db, 'retouch/' + id), {
-      manager: data.manager,
-      retouchings: data.retouching + ',' + data.otherRetouching,
-      castName: data.castName,
-      faceRetouching: data.faceRetouching,
-      deadlines: getDate(parseFloat(data.deadline)) +  ' ' + data.otherDeadline,
-      shop: data.shop,
-      completed: 'false',
-      id: id,
-      img: data.img,
-    })
-  }
-  
-// 画像のアップロード(PC)
-const send_files = computed(function() {
-  return data.files
+<script setup>
+import { onMounted, reactive, computed } from 'vue';
+import { useStore } from 'vuex';
+import { getDatabase, ref, set, query, get, orderByChild, equalTo } from "firebase/database";
+import { initializeApp } from "firebase/app";
+import { getStorage, ref as imgRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
+  authDomain: "nicoro-request-form.firebaseapp.com",
+  databaseURL: "https://nicoro-request-form-default-rtdb.firebaseio.com",
+  projectId: "nicoro-request-form",
+  storageBucket: "nicoro-request-form.appspot.com",
+  messagingSenderId: "771124177365",
+  appId: "1:771124177365:web:d19a5c49a3a5750bb4b55c"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const databaseRetouchRef = ref(db, 'retouch');
+const isCheckedPlain = reactive({
+  checked: false
 })
+const isCheckedPlain2 = reactive({
+  checked: false
+})
+const data = reactive ({
+  manager: '',
+  retouching: [],
+  otherRetouching: [],
+  retouchings: [],
+  castName: '',
+  faceRetouching: '',
+  deadline: '',
+  otherDeadline: [],
+  deadlines: [],
+  shop: '',
+  num_per_page: 5,
+  fire_data: [],
+  completed: '',
+  store: useStore(),
+  id: '',
+  isEnter: false,
+  files: [],
+  successWidth: 0,
+  uploadModal: false,
+  send: '送信完了',
+  sending: false,
+  send_completed: true,
+  progressBar: false,
+  img: 'false',
+  imgUrls: [],
+})
+// 依頼の追加
+const add = ()=> {
+  data.uploadModal = true
+  let d = new Date()
+  let id = d.getTime()
+  const imagePaths = [];
+  const metadata = {
+    contentType: 'image/jpeg',
+  }
+  // 画像がある時の処理
+  const storage = getStorage(app);
+  data.files.map(async file => {
+    data.progressBar = true
+    data.sending = true
+    data.send_completed = false
+    data.send = '送信中'
+    data.img = 'true'
+    const fileRef = imgRef(storage, data.castName + '/' + file.name);
+    await uploadBytesResumable(fileRef, file, metadata);
+    const singleImgPath = await getDownloadURL(fileRef);
+    imagePaths.push(singleImgPath)
+    if(imagePaths.length == data.files.length){
+      console.log('got all paths here now:', imagePaths);
+      const uploadTask = uploadBytesResumable(fileRef, file);
+      uploadTask.on('state_changed', (snapshot)=> {
+        let percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        data.successWidth = percentage;
+        if (percentage == 100) {
+          data.send = '送信完了'
+          data.sending = false
+          data.send_completed = true
+        }
+      });
+    }
+  })
+  // DB書き込み
+  function getDate(deadline) {
+    if (deadline) {
+      const date = new Date();
+      date.setDate(date.getDate() + deadline);
+      const month = date.getMonth() + 1;
+      const day = date.getDate()
+      return String(month) + '/' + String(day);
+    } else {
+      return data.deadline;
+    }
+  }
+  set(ref(db, 'retouch/' + id), {
+    manager: data.manager,
+    retouchings: data.retouching + ',' + data.otherRetouching,
+    castName: data.castName,
+    faceRetouching: data.faceRetouching,
+    deadlines: getDate(parseFloat(data.deadline)) +  ' ' + data.otherDeadline,
+    shop: data.shop,
+    completed: 'false',
+    id: id,
+    img: data.img,
+  })
+}
+
+// 画像のアップロード(PC)
+const imgUrls = data.imgUrls;
 const dragEnter = ()=> {
   data.isEnter = true;
 }
@@ -294,66 +295,84 @@ const dragLeave = ()=> {
   data.isEnter = false;
 }
 function dropFile(event) {
-  data.files.push(...event.dataTransfer.files);
-   // ...で複数選べる
+  const array = [];
+  array.push(...event.dataTransfer.files); // ...で複数選べる
   data.isEnter = false;
+  for( let i = 0; i < event.dataTransfer.files.length; i++ ) {
+    const file =  event.dataTransfer.files[i];
+    const reader = new FileReader();
+    reader.onload = function() {
+      // サムネイルとして表示
+      imgUrls.push(reader.result);
+      data.files.push(file);
+    };
+    reader.readAsDataURL(file);
+  }
+  event.preventDefault();
 }
 function deleteFile(img) {
-  data.files.splice(img, 1)
+  data.imgUrls.splice(img, 1);
+  data.files.splice(img, 1);
 }
 // 画像のアップロード(スマホ・タブレット)
 function uploadFile(event) {
   for( let i = 0; i < event.target.files.length; i++ ) {
-    data.files.push(event.target.files[i]);
+    const file =  event.target.files[i];
+    const reader = new FileReader();
+    reader.onload = function() {
+      // サムネイルとして表示
+      imgUrls.push(reader.result);
+      data.files.push(file);
+    };
+    reader.readAsDataURL(file);
   }
+  console.log(data.files);
+  console.log(imgUrls);
+  event.preventDefault();
 }
-
 const closeUploadModal = () => {
   data.uploadModal = false;  
   location.reload(); 
 }
-
-  // DB取得
-  const getRetouchData = ()=> {
-    get(query(databaseRetouchRef, orderByChild('completed'), equalTo('false'))).then((snapshot)=> {
-      let arr = []
-      let result = snapshot.val()
-      for(let item in result) {
-        arr.unshift(result[item]) // 新しい物が上に来るようにしている
-      }
-      data.fire_data = arr
-    })
-  }
-  // ページの表示項目
-  const request_items = computed(function() {
-    return data.fire_data.slice( // slice(○○ , ××)で取り出す範囲設定(○○から××まで)
-      data.num_per_page * data.store.state.page, // 0番目から
-      data.num_per_page * (data.store.state.page + 1)  // 5番目まで(5番目は入らないので取り出すのは0番目から4番目の5つ)
-    )
-  })
-  // 表示ページを表す値
-  const page = computed({
-    get: () => { // デフォルトに表示するページ
-      return data.store.state.page
-    },
-    set: (x) => { // lengthは長さ  0より小さい時は0、最後のページより大きいときは最後のページを表示
-      var pg = x > (data.fire_data.length - 1) / data.num_per_page ?
-        Math.ceil((data.fire_data.length - 1) / data.num_per_page) - 1 : x
-      pg = pg < 0 ? 0 : pg
-      data.store.commit('set_page',pg)
+// DB取得
+const getRetouchData = ()=> {
+  get(query(databaseRetouchRef, orderByChild('completed'), equalTo('false'))).then((snapshot)=> {
+    let arr = []
+    let result = snapshot.val()
+    for(let item in result) {
+      arr.unshift(result[item]) // 新しい物が上に来るようにしている
     }
+    data.fire_data = arr
   })
-  // 次のページ
-  const next = ()=> {
-    page.value++
+}
+// ページの表示項目
+const request_items = computed(function() {
+  return data.fire_data.slice( // slice(○○ , ××)で取り出す範囲設定(○○から××まで)
+    data.num_per_page * data.store.state.page, // 0番目から
+    data.num_per_page * (data.store.state.page + 1)  // 5番目まで(5番目は入らないので取り出すのは0番目から4番目の5つ)
+  )
+})
+// 表示ページを表す値
+const page = computed({
+  get: () => { // デフォルトに表示するページ
+    return data.store.state.page
+  },
+  set: (x) => { // lengthは長さ  0より小さい時は0、最後のページより大きいときは最後のページを表示
+    var pg = x > (data.fire_data.length - 1) / data.num_per_page ?
+      Math.ceil((data.fire_data.length - 1) / data.num_per_page) - 1 : x
+    pg = pg < 0 ? 0 : pg
+    data.store.commit('set_page',pg)
   }
-  // 前のページ
-  const prev = ()=> {
-    page.value--
-  }
-  
-  onMounted(()=> {
-    getRetouchData()
-  })
-  </script>
-  
+})
+// 次のページ
+const next = ()=> {
+  page.value++
+}
+// 前のページ
+const prev = ()=> {
+  page.value--
+}
+onMounted(()=> {
+  getRetouchData()
+})
+</script>

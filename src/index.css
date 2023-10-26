@@ -40,8 +40,8 @@
   border: 10px dotted powderblue;
 }
 .delete-mark {
-  top: -11px;
-  right: -10px;
+  top: -20px;
+  right: -5px;
 }
 .cursor {
   cursor: pointer;
@@ -55,5 +55,20 @@
   }
   .pc_area {
     display: none;
+  }
+  input[type="file"] {
+    display: none;
+  }
+  .select_file {
+    padding: 2px 7px;
+    color: black;
+    background-color: #efefef;
+    border: 0.7px solid #7c7d7e;
+    border-radius: 2px;
+  }
+}
+@media (max-width: 400px) {
+  .delete-mark {
+    top: -15px;
   }
 }
