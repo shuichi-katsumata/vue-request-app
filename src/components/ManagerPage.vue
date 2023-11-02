@@ -77,7 +77,9 @@ export default {
 import { onMounted, reactive, computed } from 'vue';
 import { getDatabase, ref, query, get, update, orderByChild, equalTo } from "firebase/database";
 import { initializeApp } from "firebase/app";
-import { getStorage, ref as imgRef, getDownloadURL, listAll, deleteObject } from "firebase/storage";
+import { getStorage, ref as imgRef, getDownloadURL, getMetadata, listAll, deleteObject } from "firebase/storage";
+import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
 
 const firebaseConfig = {
   apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
@@ -114,29 +116,22 @@ const request_items = computed(function() {
 })
 // 画像ダウンロードボタン
 async function imagesDownload(eventName) { // 関数の前にasyncを宣言することで、非同期関数（async function）を定義できる。awaitを指定すると、その結果が返されるまでそれ以下は実行されず一時停止する
+  const jszip = new JSZip();
   const storage = getStorage();
   const folderRef = imgRef(storage, eventName);
   const imagesList = await listAll(folderRef);
-  const urls = await Promise.all(
-    imagesList.items.map(ref => getDownloadURL(ref))
-  )
-  for(let i=1; i<urls.length+1; i++) {
-    const url = urls[i-1]
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = 'blob';
-    xhr.open('GET', url);
-    xhr.send();
-    xhr.onload = function() {
-      const blob = xhr.response;
-      const objURL = window.URL.createObjectURL(blob);
-      const objLink = document.createElement('a');
-      document.body.appendChild(objLink);
-      objLink.href = objURL;
-      objLink.download = imagesList.items[i-1].name;
-      objLink.click();
-    }
-  }
-}
+  const promises = imagesList.items.map(async (item) => {
+    const file = await getMetadata(item);
+    const fileRef = imgRef(storage, item.fullPath);
+    const fileBlob = await getDownloadURL(fileRef).then((url) => {
+      return fetch(url).then((response) => response.blob());
+    });
+    jszip.file(file.name, fileBlob);
+  }).reduce((acc, curr) => acc.then(() => curr), Promise.resolve());
+  await promises;
+  const blob = await jszip.generateAsync({ type: 'blob' });
+  saveAs(blob, eventName + '.zip');
+};
 // バナー完了ボタン
 function bannerCompleted(key) {
   update(ref(db, 'banner/' + key), {
