@@ -5,6 +5,14 @@
   color: #2c3e50;
   margin-top: 40px;
 }
+.required {
+  font-size: 0.8rem;
+  color: red;
+  margin-right: 1.5rem;
+  margin-bottom: 0;
+  text-align: right;
+  font-weight: bold;
+}
 .input-group h4 {
   line-height: 2em;
 }

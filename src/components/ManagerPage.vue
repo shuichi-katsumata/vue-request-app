@@ -115,22 +115,22 @@ const request_items = computed(function() {
   return data.fire_data
 })
 // 画像ダウンロードボタン
-async function imagesDownload(eventName) { // 関数の前にasyncを宣言することで、非同期関数（async function）を定義できる。awaitを指定すると、その結果が返されるまでそれ以下は実行されず一時停止する
+async function imagesDownload(eventName) { 
   const jszip = new JSZip();
   const storage = getStorage();
   const folderRef = imgRef(storage, eventName);
-  const imagesList = await listAll(folderRef);
-  const promises = imagesList.items.map(async (item) => {
+  const imagesList = await listAll(folderRef); // storageのeventnameの中身を返す
+  const promises = imagesList.items.map(async (item) => { //mapは新しい配列を生成するための物
     const file = await getMetadata(item);
     const fileRef = imgRef(storage, item.fullPath);
     const fileBlob = await getDownloadURL(fileRef).then((url) => {
       return fetch(url).then((response) => response.blob());
     });
     jszip.file(file.name, fileBlob);
-  }).reduce((acc, curr) => acc.then(() => curr), Promise.resolve());
+  }).reduce((acc, curr) => acc.then(() => curr), Promise.resolve());  // accは蓄積されていく値、currは現在の配列の要素（次の要素）が渡される
   await promises;
-  const blob = await jszip.generateAsync({ type: 'blob' });
-  saveAs(blob, eventName + '.zip');
+  const blob = await jszip.generateAsync({ type: 'blob' }); // generateAsyncでzipデータが作成される
+  saveAs(blob, eventName + '.zip'); // 保存
 };
 // バナー完了ボタン
 function bannerCompleted(key) {

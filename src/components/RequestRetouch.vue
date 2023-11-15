@@ -23,7 +23,10 @@
             <input v-model="data.manager" class="form-control">
           </div>
           <div class="input-group align-items-center mb-3">
-            <h5 class="me-3">キャスト名：</h5>
+            <div class="flex-column">
+              <h5 class="me-3 mb-0">キャスト名：</h5>
+              <p class="required">※必須項目です</p>
+            </div>
             <input v-model="data.castName" class="form-control">
           </div>
           <div class="row mb-3">
@@ -102,7 +105,10 @@
               </li>
             </ul>
           </div>
-          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end pe-none"  v-if="data.castName == ''">
+            <button class="btn btn-secondary">投稿</button>
+          </div>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end" v-else>
             <button @click="add" class="btn btn-primary">投稿</button>
           </div>
         </div>
