@@ -28,12 +28,26 @@
               <td>
                 <button class="btn btn_space btn-secondary pe-none" v-if="item.img == 'false'" ><i class="fa-solid fa-download" style="color: #ffffff;"></i></button>
                 <button class="btn btn_space btn-success" @click="imagesDownload(item.eventName)" v-if="item.img == 'true'"><i class="fa-solid fa-download" style="color: #ffffff;"></i></button>
-                <button class="btn btn-danger ms-3" @click="bannerCompleted(item.id); DeleteImage(item.eventName);">完了</button>
+                <button class="btn btn-danger ms-3" @click="openModal_1(item.id, item.eventName)">完了</button>
               </td>
-              
             </tr>
         </tbody>
       </table>
+    </div>
+    <div v-show="data.uploadModal_1">
+      <div class="z-2 position-fixed top-0 start-0 h-100 w-100 d-flex items-center justify-content-center" style="background-color:rgba(0,0,0,0.5)">
+        <div class="z-3 bg-white .text-secondary w-auto rounded mt-4 p-2" style="height: fit-content;">
+          <p class="text-center">選択したタスクを完了させます</p>
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-danger me-3" @click="bannerCompleted(data.id); DeleteImage(data.name); closeModal();">
+              完了
+            </button>
+            <button class="btn btn_space btn-secondary" @click="closeModal">
+              キャンセル
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <h3>レタッチタスク</h3>
       <div class="table-responsive mb-4">
@@ -59,11 +73,26 @@
               <td>
                 <button class="btn btn_space btn-secondary pe-none" v-if="item.img == 'false'" ><i class="fa-solid fa-download" style="color: #ffffff;"></i></button>
                 <button class="btn btn_space btn-success" @click="imagesDownload(item.castName)" v-if="item.img == 'true'"><i class="fa-solid fa-download" style="color: #ffffff;"></i></button>
-                <button class="btn btn-danger ms-3" @click="retouchCompleted(item.id); DeleteImage(item.castName);">完了</button>
+                <button class="btn btn-danger ms-3" @click="openModal_2(item.id, item.castName)">完了</button>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+      <div v-show="data.uploadModal_2">
+        <div class="z-2 position-fixed top-0 start-0 h-100 w-100 d-flex items-center justify-content-center" style="background-color:rgba(0,0,0,0.5)">
+          <div class="z-3 bg-white .text-secondary w-auto rounded mt-4 p-2" style="height: fit-content;">
+            <p class="text-center">選択したタスクを完了させます</p>
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-danger me-3" @click="retouchCompleted(data.id); DeleteImage(data.name); closeModal();">
+                完了
+              </button>
+              <button class="btn btn_space btn-secondary" @click="closeModal">
+                キャンセル
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
   </section>
 </template>
@@ -97,6 +126,10 @@ const databaseRetouchRef = ref(db, 'retouch');
 const data = reactive ({
   fire_data: [],
   completed: '',
+  uploadModal_1: false,
+  uploadModal_2: false,
+  id: '',
+  name: '',
 })
 
 // DB取得
@@ -132,6 +165,21 @@ async function imagesDownload(eventName) {
   const blob = await jszip.generateAsync({ type: 'blob' }); // generateAsyncでzipデータが作成される
   saveAs(blob, eventName + '.zip'); // 保存
 };
+//　完了ボタン
+function openModal_1(id, name) {
+  data.uploadModal_1 = true
+  data.id = id
+  data.name = name
+}
+function openModal_2(id, name) {
+  data.uploadModal_2 = true
+  data.id = id
+  data.name = name
+}
+const closeModal = ()=> {
+  data.uploadModal_1 = false
+  data.uploadModal_2 = false
+}
 // バナー完了ボタン
 function bannerCompleted(key) {
   update(ref(db, 'banner/' + key), {
