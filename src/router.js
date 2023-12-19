@@ -36,13 +36,13 @@ export const router = new createRouter({
     ]
 })
 const firebaseConfig = {
-  apiKey: "AIzaSyBOdd12L5VTc_1QuyuE5vO4EBeR_rQ3sSQ",
-  authDomain: "test-request-form.firebaseapp.com",
-  databaseURL: "https://test-request-form-default-rtdb.firebaseio.com",
-  projectId: "test-request-form",
-  storageBucket: "test-request-form.appspot.com",
-  messagingSenderId: "491893541154",
-  appId: "1:491893541154:web:67718278b1dc6666d6bd7b"
+  apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
+  authDomain: "nicoro-request-form.firebaseapp.com",
+  databaseURL: "https://nicoro-request-form-default-rtdb.firebaseio.com",
+  projectId: "nicoro-request-form",
+  storageBucket: "nicoro-request-form.appspot.com",
+  messagingSenderId: "771124177365",
+  appId: "1:771124177365:web:d19a5c49a3a5750bb4b55c"
 };
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app);
