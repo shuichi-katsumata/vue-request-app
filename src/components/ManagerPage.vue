@@ -109,15 +109,16 @@ import { initializeApp } from "firebase/app";
 import { getStorage, ref as imgRef, getDownloadURL, getMetadata, listAll, deleteObject } from "firebase/storage";
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
+import dayjs from "dayjs";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
-  authDomain: "nicoro-request-form.firebaseapp.com",
-  databaseURL: "https://nicoro-request-form-default-rtdb.firebaseio.com",
-  projectId: "nicoro-request-form",
-  storageBucket: "nicoro-request-form.appspot.com",
-  messagingSenderId: "771124177365",
-  appId: "1:771124177365:web:d19a5c49a3a5750bb4b55c"
+  apiKey: "AIzaSyBOdd12L5VTc_1QuyuE5vO4EBeR_rQ3sSQ",
+  authDomain: "test-request-form.firebaseapp.com",
+  databaseURL: "https://test-request-form-default-rtdb.firebaseio.com",
+  projectId: "test-request-form",
+  storageBucket: "test-request-form.appspot.com",
+  messagingSenderId: "491893541154",
+  appId: "1:491893541154:web:67718278b1dc6666d6bd7b"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -182,8 +183,11 @@ const closeModal = ()=> {
 }
 // バナー完了ボタン
 function bannerCompleted(key) {
+  const completeDay = dayjs().format("MM/DD")
   update(ref(db, 'banner/' + key), {
     completed: 'true',
+    completeDay: completeDay,
+    post: 'false',
   })
   getBannerData();
 }
@@ -218,8 +222,11 @@ const retouchRequest_items = computed(function() {
 })
 // レタッチ完了ボタン
 function retouchCompleted(key) {
+  const completeDay = dayjs().format("MM/DD")
   update(ref(db, 'retouch/' + key), {
     completed: 'true',
+    completeDay: completeDay,
+    post: 'false',
   })
   getRetouchData();
 }

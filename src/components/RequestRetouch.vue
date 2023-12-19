@@ -171,6 +171,50 @@
         <span class="btn btn-secondary me-4" @click="prev">&lt; prev</span>
         <span class="btn btn-secondary ms-4" @click="next">next &gt;</span>
       </div>
+      <h3>確認及び掲載</h3>
+    <div class="table-responsive mb-4">
+      <table class="table table-striped text-nowrap"  style="width:1296px;">
+        <thead>
+          <tr>
+            <th scope="col">店舗</th>
+            <th scope="col">担当者</th>
+            <th scope="col">依頼日</th>
+            <th scope="col">納品日</th>
+            <th scope="col">イベント名</th>
+            <th scope="col">確認及び掲載</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item) in completed_request_items">
+            <td class="text-wrap">{{ item.shop }}</td>
+            <td class="text-wrap">{{ item.manager }}</td>
+            <td class="text-wrap">{{ item.requestDay }}</td>
+            <td class="text-wrap">{{ item.completeDay }}</td>
+            <td class="text-wrap">{{ item.castName }}</td>
+            <td>
+              <button class="btn btn-outline-warning" v-if="item.shopConfirmation == 'false'" @click="confirmationCheck(item.id)" >&ensp;確認&ensp;</button>
+              <button class="btn btn-warning text-white" v-if="item.shopConfirmation == 'true'" @click="confirmationUncheck(item.id)">&#10004;&nbsp;確認</button>
+              <button class="btn btn-outline-success ms-3" @click="openPostModal(item.id)">&ensp;掲載&ensp;</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div v-show="data.postModal">
+      <div class="z-2 position-fixed top-0 start-0 h-100 w-100 d-flex items-center justify-content-center" style="background-color:rgba(0,0,0,0.5)">
+        <div class="z-3 bg-white .text-secondary w-auto rounded mt-4 p-2" style="height: fit-content;">
+          <p class="text-center">掲載は完了しましたか？</p>
+          <div class="d-flex justify-content-center">
+            <button class="btn btn-warning text-white me-3" @click="postCheck(data.id); closeModal();">
+              はい
+            </button>
+            <button class="btn btn_space btn-secondary" @click="closeModal">
+              いいえ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     </section>
   </template>
   
@@ -183,18 +227,19 @@ export default {
 <script setup>
 import { onMounted, reactive, computed } from 'vue';
 import { useStore } from 'vuex';
-import { getDatabase, ref, set, query, get, orderByChild, equalTo } from "firebase/database";
+import { getDatabase, ref, set, query, get, update, orderByChild, equalTo } from "firebase/database";
 import { initializeApp } from "firebase/app";
 import { getStorage, ref as imgRef, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import dayjs from "dayjs";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
-  authDomain: "nicoro-request-form.firebaseapp.com",
-  databaseURL: "https://nicoro-request-form-default-rtdb.firebaseio.com",
-  projectId: "nicoro-request-form",
-  storageBucket: "nicoro-request-form.appspot.com",
-  messagingSenderId: "771124177365",
-  appId: "1:771124177365:web:d19a5c49a3a5750bb4b55c"
+  apiKey: "AIzaSyBOdd12L5VTc_1QuyuE5vO4EBeR_rQ3sSQ",
+  authDomain: "test-request-form.firebaseapp.com",
+  databaseURL: "https://test-request-form-default-rtdb.firebaseio.com",
+  projectId: "test-request-form",
+  storageBucket: "test-request-form.appspot.com",
+  messagingSenderId: "491893541154",
+  appId: "1:491893541154:web:67718278b1dc6666d6bd7b"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -218,7 +263,8 @@ const data = reactive ({
   shop: '',
   num_per_page: 5,
   fire_data: [],
-  completed: '',
+  completed_fire_data: [],
+  completed: 'false',
   store: useStore(),
   id: '',
   isEnter: false,
@@ -231,6 +277,10 @@ const data = reactive ({
   progressBar: false,
   img: 'false',
   imgUrls: [],
+  completeDay: '',
+  shopConfirmation: 'false',
+  post: '',
+  postModal: false,
 })
 // 依頼の追加
 const add = ()=> {
@@ -273,12 +323,13 @@ const add = ()=> {
       const date = new Date();
       date.setDate(date.getDate() + deadline);
       const month = date.getMonth() + 1;
-      const day = date.getDate()
+      const day = date.getDate();
       return String(month) + '/' + String(day);
     } else {
       return data.deadline;
     }
   }
+  const requestDay = dayjs().format("MM/DD")
   set(ref(db, 'retouch/' + id), {
     manager: data.manager,
     retouchings: data.retouching + ',' + data.otherRetouching,
@@ -286,9 +337,13 @@ const add = ()=> {
     faceRetouching: data.faceRetouching,
     deadlines: getDate(parseFloat(data.deadline)) +  ' ' + data.otherDeadline,
     shop: data.shop,
-    completed: 'false',
+    completed: data.completed,
     id: id,
     img: data.img,
+    requestDay:  requestDay,
+    completeDay: data.completeDay,
+    shopConfirmation: data.shopConfirmation,
+    post: data.post,
   })
 }
 
@@ -351,12 +406,25 @@ const getRetouchData = ()=> {
     data.fire_data = arr
   })
 }
+const getCompletedRetouchData = ()=> {
+  get(query(databaseRetouchRef, orderByChild('post'), equalTo('false'))).then((snapshot)=> {
+    let arr = []
+    let result = snapshot.val()
+    for(let item in result) {
+      arr.unshift(result[item]) // 新しい物が上に来るようにしている
+    }
+    data.completed_fire_data = arr
+  })
+}
 // ページの表示項目
 const request_items = computed(function() {
   return data.fire_data.slice( // slice(○○ , ××)で取り出す範囲設定(○○から××まで)
     data.num_per_page * data.store.state.page, // 0番目から
     data.num_per_page * (data.store.state.page + 1)  // 5番目まで(5番目は入らないので取り出すのは0番目から4番目の5つ)
   )
+})
+const completed_request_items = computed(function() {
+  return data.completed_fire_data
 })
 // 表示ページを表す値
 const page = computed({
@@ -378,7 +446,33 @@ const next = ()=> {
 const prev = ()=> {
   page.value--
 }
+function confirmationCheck(key) {
+  update(ref(db, 'retouch/' + key), {
+    shopConfirmation: 'true',
+  })
+  getCompletedRetouchData();
+}
+function confirmationUncheck(key) {
+  update(ref(db, 'retouch/' + key), {
+    shopConfirmation: 'false',
+  })
+  getCompletedRetouchData();
+}
+function openPostModal(key) {
+  data.postModal = true
+  data.id = key
+}
+function postCheck(key) {
+  update(ref(db, 'retouch/' + key), {
+    post: 'true',
+  })
+  getCompletedRetouchData();
+}
+const closeModal = ()=> {
+  data.postModal = false
+}
 onMounted(()=> {
-  getRetouchData()
+  getRetouchData(),
+  getCompletedRetouchData()
 })
 </script>

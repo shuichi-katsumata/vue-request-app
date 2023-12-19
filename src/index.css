@@ -30,6 +30,9 @@
 .btn-warning:hover {
   color: #fff;
 }
+.btn-outline-warning:hover {
+  color: #fff;
+}
 .btn_space {
   vertical-align: middle;
   box-shadow: none !important;
