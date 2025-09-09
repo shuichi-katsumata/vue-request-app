@@ -41,6 +41,12 @@
 .table button.btn {
   vertical-align: middle;
 }
+.table thead th {
+  border-bottom: none;
+}
+tbody {
+  border-top: 1px solid #000;
+}
 .drop_area {
   width: 500px;
   height: 300px;

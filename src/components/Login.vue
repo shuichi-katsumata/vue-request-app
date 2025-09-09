@@ -20,23 +20,14 @@
 <script setup>
   import { reactive } from 'vue';
   import { getAuth, signInWithEmailAndPassword, setPersistence,  browserSessionPersistence } from "firebase/auth";
-  import { initializeApp } from "firebase/app";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
-    authDomain: "nicoro-request-form.firebaseapp.com",
-    databaseURL: "https://nicoro-request-form-default-rtdb.firebaseio.com",
-    projectId: "nicoro-request-form",
-    storageBucket: "nicoro-request-form.appspot.com",
-    messagingSenderId: "771124177365",
-    appId: "1:771124177365:web:d19a5c49a3a5750bb4b55c"
-  };
-  initializeApp(firebaseConfig);
   const data = reactive({
     mailAddress: '',
     password: '',
   });
+
   const auth = getAuth();
+  
   const login = async() => {
     await setPersistence(auth, browserSessionPersistence).then( () => {
       return signInWithEmailAndPassword(auth, data.mailAddress, data.password);
@@ -46,6 +37,6 @@
       console.log(errorCode)
       console.log(errorMessage)
     })
-    location.reload()
+    location.reload();
   }
 </script>

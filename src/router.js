@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import RequestBanner from './components/RequestBanner.vue'
 import RequestRetouch from './components/RequestRetouch.vue'
 import ManagerPage from './components/ManagerPage.vue'
@@ -31,21 +30,10 @@ export const router = new createRouter({
             path: '/login',
             name: 'login',
             component: Login,
-            meta: { requiresAuth: false }
+            meta: { requiresAuth: false, showNav: false }
         },
     ]
 })
-const firebaseConfig = {
-  apiKey: "AIzaSyClRCzHKuN0GAGN0qNn3jsj6pJL7qCREZo",
-  authDomain: "nicoro-request-form.firebaseapp.com",
-  databaseURL: "https://nicoro-request-form-default-rtdb.firebaseio.com",
-  projectId: "nicoro-request-form",
-  storageBucket: "nicoro-request-form.appspot.com",
-  messagingSenderId: "771124177365",
-  appId: "1:771124177365:web:d19a5c49a3a5750bb4b55c"
-};
-const app = initializeApp(firebaseConfig)
-const auth = getAuth(app);
 
 router.beforeEach(async (to, from) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
