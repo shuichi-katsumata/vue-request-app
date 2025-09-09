@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import { getAuth } from "firebase/auth";
 import RequestBanner from './components/RequestBanner.vue'
 import RequestRetouch from './components/RequestRetouch.vue'
@@ -6,7 +6,7 @@ import ManagerPage from './components/ManagerPage.vue'
 import Login from './components/Login.vue'
 
 export const router = new createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes: [
         {
             path: '/',
