@@ -90,7 +90,7 @@
         <h5> レタッチ画像：</h5>
         <div class="phone_area">
           <label class="select_file">
-            <input type="file" @change="uploadFile" multiple>ファイル選択
+            <input type="file" @change="imgUploadStore.uploadFile" multiple>ファイル選択
           </label>
         </div>
         <div class="pc_area">

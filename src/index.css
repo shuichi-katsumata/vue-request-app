@@ -84,8 +84,12 @@ tbody {
     border-radius: 2px;
   }
 }
-@media (max-width: 400px) {
+@media (max-width: 450px) {
+  .btnBox a{
+    margin-bottom: 1rem;
+  }
   .delete-mark {
     top: -15px;
   }
+
 }

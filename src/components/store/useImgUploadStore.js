@@ -40,22 +40,29 @@ export const useImgUploadStore = defineStore('registration', () => {
 
   // 画像のアップロード(スマホ・タブレット)
   const uploadFile = (event) => {
-    const dataFiles = [...event.target.files];
-    requestStore.imgFiles = dataFiles;
-    const previews = [];
+    const files = [...event.target.files];
+    requestStore.imgFiles = [...requestStore.imgFiles, ...files]; // 既存ファイルに追加
 
-    dataFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = function() {
-        // サムネイルとして表示
-        previews.push(reader.result);
-        requestStore.imgUrls = [...previews];
+    const readFileAsDataURL = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    };
 
-      };
-      reader.readAsDataURL(file);
-    });
+    Promise.all(files.map(file => readFileAsDataURL(file)))
+      .then((urls) => {
+        // 既存の imgUrls に追加
+        requestStore.imgUrls = [...requestStore.imgUrls, ...urls];
+      })
+      .catch((err) => {
+        console.error("画像読み込みエラー", err);
+      });
+
     event.preventDefault();
-  }
+  };
 
   const deleteFile = (img) => {
     requestStore.imgUrls.splice(img, 1);
