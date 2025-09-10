@@ -41,37 +41,71 @@ Firebase を利用した認証・データ管理が可能な SPA です。
 ## ディレクトリ構成
 
 request-form/
+
 ├─ assets/
+
 │  ├─ index-CAxlSWiZ.js
+
 │  └─ index-CKA0i-7b.css
+
 ├─ public/
+
 │  └─ favicon.ico
+
 ├─ src/
+
 │  ├─ assets/img/
+
 │  │  ├─ icon-file.png
+
 │  │  └─ logo.png
+
 │  ├─ components/
+
 │  │  ├─ Login.vue
+
 │  │  ├─ ManagerPage.vue
+
 │  │  ├─ RequestBanner.vue
+
 │  │  ├─ RequestRetouch.vue
+
 │  │  ├─ TaskCompleteModal.vue
+
 │  │  ├─ UploadModal.vue
+
 │  │  ├─ firebase_settings/
+
 │  │  │  └─ index.js
+
 │  │  └─ store/
+
 │  │     ├─ useDataStore.js
+
 │  │     ├─ useImgUploadStore.js
+
 │  │     ├─ useModalStore.js
+
 │  │     └─ useRequestStore.js
+
 │  ├─ App.vue
+
 │  ├─ index.css
+
 │  ├─ main.js
+
 │  └─ router.js
+
 ├─ .gitignore
+
 ├─ favicon.ico
+
 ├─ index.html
+
 ├─ package-lock.json
+
 ├─ package.json
+
 ├─ vite.config.js
+
 └─ README.md # このファイル
