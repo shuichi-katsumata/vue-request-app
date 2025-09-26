@@ -98,8 +98,6 @@ request-form/
 
 ├─ .gitignore
 
-├─ favicon.ico
-
 ├─ index.html
 
 ├─ package-lock.json
