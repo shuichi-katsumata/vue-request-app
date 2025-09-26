@@ -52,7 +52,7 @@
               <td class="text-wrap">{{ item.shop }}</td>
               <td class="text-wrap">{{ item.manager }}</td>
               <td class="text-wrap">{{ item.requestTitle }}</td>
-              <td class="text-wrap">{{ item.retouchings }}</td>
+              <td class="text-wrap">{{ item.orders }}</td>
               <td class="text-wrap">{{ item.faceRetouching }}</td>
               <td class="text-wrap">{{ item.deadlines }}</td>
               <td>

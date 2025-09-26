@@ -171,7 +171,7 @@
             <td class="text-wrap">{{ item.requestDay }}</td>
             <td class="text-wrap">{{ item.completeDay }}</td>
             <td class="text-wrap">{{ item.requestTitle }}</td>
-            <td class="text-wrap">{{ item.sizes }}</td>
+            <td class="text-wrap">{{ item.orders }}</td>
             <td>
               <button class="btn" :class="[item.shopConfirmation === 'true' ? 'btn-primary' : 'btn-outline-primary']" @click="modalStore.confirmationCheck('banner', item.id, item.shopConfirmation)" >&ensp;確認&ensp;</button>
               <button class="btn btn-outline-success ms-3" @click="modalStore.openPostModal(item.id)">&ensp;掲載&ensp;</button>
