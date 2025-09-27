@@ -42,12 +42,6 @@ Firebase を利用した認証・データ管理が可能な SPA です。
 
 request-form/
 
-├─ assets/
-
-│  ├─ index-CAxlSWiZ.js
-
-│  └─ index-CKA0i-7b.css
-
 ├─ public/
 
 │  └─ favicon.ico
