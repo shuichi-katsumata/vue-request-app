@@ -20,16 +20,14 @@ export const useImgUploadStore = defineStore('registration', () => {
   // 画像のアップロード(PC)
   const dropFile = (event) => {
     const dataFiles = [...event.dataTransfer.files];
-    requestStore.imgFiles = dataFiles;
+    requestStore.imgFiles.push(...dataFiles);
     isEnter.value = false;
-    const previews = [];
 
     dataFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = () => {
         // サムネイルとして表示
-        previews.push(reader.result);
-        requestStore.imgUrls = [...previews];      
+        requestStore.imgUrls.push(reader.result);      
       
       };
       reader.readAsDataURL(file);

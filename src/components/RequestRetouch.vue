@@ -97,7 +97,7 @@
           <div class="drop_area text-secondary fw-bold fs-4 d-flex justify-content-center align-items-center" @dragenter="imgUploadStore.dragEnter" @dragleave="imgUploadStore.dragLeave" @dragover.prevent @drop.prevent="imgUploadStore.dropFile"  :class="{ enter: imgUploadStore.isEnter }">ファイルアップロード</div></div>
         <div>
           <ul class="list-unstyled d-flex flex-wrap justify-content-start mt-3 p-0">
-            <li v-for="(imgUrl, img) in requestStore.imgUrls" :key="img"  class="position-relative cursor d-flex flex-column fs-6 p-2 w-25">
+            <li v-for="(imgUrl, img) in requestStore.imgUrls" :key="imgUrl"  class="position-relative cursor d-flex flex-column fs-6 p-2 w-25">
               <div>
                 <span class="position-absolute display-6 delete-mark" @click="imgUploadStore.deleteFile(img)">&times</span>
                 <img id="thumb" class="w-100" :key="imgUrl" :src="imgUrl">
